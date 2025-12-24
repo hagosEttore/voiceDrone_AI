@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Control Panel</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #5d6d7e;
+            font-size: 28px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-row {
+            grid-column: span 2;
+        }
+
+        form {
+            margin: 0;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            height: 80px;
+            border: none;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #444;
+            text-transform: uppercase;
+        }
+
+        /* Palette Colori Pastello */
+        .btn-decolla { background-color: #b2e2b2; } /* Verde pastello */
+        .btn-atterra { background-color: #f9b1b1; } /* Rosso pastello */
+        .btn-sinistra { background-color: #a0d2db; } /* Azzurro pastello per Sinistra */
+        .btn-destra { background-color: #c9a0dc; } /* Viola pastello per Destra */
+        .btn-flip { background-color: #ffe0b3; } /* Arancione pastello */
+
+        /* Effetto pressione */
+        input[type="submit"]:hover {
+            filter: brightness(0.95);
+            transform: scale(1.02);
+        }
+
+        input[type="submit"]:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Comandi Drone</h1>
+    
+    <div class="grid-layout">
+        <!-- RIGA 1: DECOLLA / ATTERRA -->
+        <form method="post" action="/decolla">
+            <input type="submit" class="btn-decolla" value="Decolla">
+        </form>
+
+        <form method="get" action="/atterra">
+            <input type="submit" class="btn-atterra" value="Atterra">
+        </form>
+
+        <!-- RIGA 2: SINISTRA / DESTRA -->
+        <form method="get" action="/sinistra">
+            <input type="submit" class="btn-sinistra" value="Sinistra">
+        </form>
+
+        <form method="get" action="/destra">
+            <input type="submit" class="btn-destra" value="Destra">
+        </form>
+
+        <!-- RIGA 3: FLIP (Largo) -->
+        <form method="get" action="/flip" class="full-row">
+            <input type="submit" class="btn-flip" value="Flip">
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
