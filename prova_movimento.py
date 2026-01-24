@@ -1,25 +1,3 @@
-import keyboard
-while True:
-    print("premi un tasto per muoverti")
-    keyboard.wait("up")
-    x = 0
-    while keyboard.is_pressed("a"):
-        print("a")
-    keyboard.wait("w")
-    while keybopard.is_pressed("w"):
-        print("w")
-    keyboard.wait("right")
-    while keyboard.is_pressed("up"):
-        print("ok")
-    
-
-    keyboard.wait("q")
-    if(keyboard.is_pressed("q")):
-        print("q")
-        break
-
-
-
-
-# if keyboard.is_pressed('a'):
-#     print("hai premuto il tasto a!!")
+version https://git-lfs.github.com/spec/v1
+oid sha256:25c1573326b5449c1988925f766620bc41dfebe64130c448eb7cea2e7279afc3
+size 515

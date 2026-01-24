@@ -1,18 +1,3 @@
-from flask import Flask
-from djitellopy import Tello
-
-app = Flask(__name__)
-tello = Tello()
-tello.connect()
-
-@app.route("/decolla")
-def decolla():
-    try:
-        tello.takeoff()
-        return "Drone decollato!"
-    except Exception as e:
-        return f"Errore: {e}"
-
-if __name__ == '__main__':
-
-    app.run('127.0.0.1', 5000, debug=True)
+version https://git-lfs.github.com/spec/v1
+oid sha256:df9b9a792ce50126ee02a6b4648a92eea65c4c5a831590e4d0d0006b1fd09c3a
+size 361

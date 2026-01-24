@@ -1,0 +1,103 @@
+# Configurazione per Tello Stream App - SIMULAZIONE
+
+# Parametri del Drone Tello (usati per compatibilità)
+tello:
+  video_port: 222222 # Non usato in simulazione (original 11111)
+  control_port: 6666 # Non usato in simulazione (original 8889)
+  width: 960 # Larghezza del frame video
+  height: 720 # Altezza del frame video
+  response_timeout: 12
+  bitrate: 0
+
+# ============================================================================
+# CONFIGURAZIONE FFMPEG - SIMULAZIONE USB CAMERA
+# ============================================================================
+# 
+# Il flusso video passa SEMPRE da FFmpeg per garantire identico formato output:
+#
+#   PRODUZIONE:   Tello UDP  →  FFmpeg  →  rawvideo BGR24  →  app
+#   SIMULAZIONE:  USB Camera →  FFmpeg  →  rawvideo BGR24  →  app
+#
+# Le OUTPUT options sono IDENTICHE in entrambi i casi.
+# Cambiano solo le INPUT options (sorgente diversa).
+# ============================================================================
+
+ffmpeg:
+  custom_path: ""  # Se vuoto, cerca ffmpeg.exe nella cartella superiore o nel PATH
+  
+  # ---------------------------------------------------------------------------
+  # INPUT OPTIONS - SIMULAZIONE (USB Camera via DirectShow)
+  # ---------------------------------------------------------------------------
+  # Queste opzioni sono specifiche per la cattura da webcam Windows.
+  # Nel Tello reale si userebbero opzioni UDP diverse (vedi config originale).
+  input_options:
+    - "-fflags"
+    - "nobuffer"
+    - "-flags" 
+    - "low_delay"
+    - "-rtbufsize"      # Buffer per evitare frame drop da camera
+    - "100M"
+  
+  # Sorgente video: USB Camera (DirectShow Windows)
+  input_format: "dshow"
+  input_source: 'video=HD User Facing' # Nome camera (vedere: ffmpeg -list_devices true -f dshow -i dummy)
+  
+  # ---------------------------------------------------------------------------
+  # OUTPUT OPTIONS - IDENTICHE A PRODUZIONE
+  # ---------------------------------------------------------------------------
+  # Queste opzioni sono UGUALI sia per Tello che per simulazione.
+  # Garantiscono che l'applicazione riceva sempre lo stesso formato.
+  output_options:
+    - "-f"
+    - "rawvideo"
+    - "-pix_fmt"
+    - "bgr24"
+    - "-an"             # No audio
+    - "-sn"             # No subtitles
+
+# Risoluzione e FPS (usati sia per cattura che per output)
+camera:
+  width: 640            # Matchare risoluzione Tello
+  height: 480
+  fps: 30
+
+# Configurazione Server Flask
+flask:
+  host: "0.0.0.0"
+  port: 5000
+  debug: true
+
+# Impostazioni Generali Applicazione
+app:
+  fps_history: 30
+  jpeg_quality: 90
+
+# Parametri Connessione Wi-Fi (simulati)
+wifi:
+  auto_connect: true
+  ssid: "TELLO-MOCK"
+  timeout: 15
+
+# Parametri Rilevamento Glifi (se previsto)
+glyph_detection:
+  black_threshold: 90
+  white_threshold: 165
+  min_area: 1000
+  max_area: 100000
+  aspect_ratio_min: 0.7
+  aspect_ratio_max: 1.3
+  persistence_seconds: 2.0
+  asset_dir: "asset"
+
+# Parametri Rilevamento Testo (se previsto)
+text_detection:
+  text_detection_language: "it"
+  text_detection_threshold: 0.7
+  text_detection_gpu_mode: true
+
+  textbox_color: [0, 255, 0]
+  box_thickness: 1
+  text_font: cv2.FONT_HERSHEY_SIMPLEX
+  text_font_scale: 0.5
+  text_font_thickness: 1
+  text_color: [255, 0, 0]

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Control - Voice Drone AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #1b5e20;
+            --primary-green-light: #2e7d32;
+            --accent-green: #66bb6a;
+            --background: #f1f8f6;
+            --surface: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #757575;
+            --border: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            padding: 32px 24px;
+        }
+
+        .mic-button {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 32px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(27, 94, 32, 0.3);
+        }
+
+        .mic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 24px rgba(27, 94, 32, 0.4);
+        }
+
+        .mic-button.listening {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #7ec57e 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 4px 16px rgba(102, 187, 106, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 16px rgba(102, 187, 106, 0.8);
+            }
+            100% {
+                box-shadow: 0 4px 16px rgba(102, 187, 106, 0.4);
+            }
+        }
+
+        .status-area {
+            background: var(--background);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 24px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .status-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .status-text {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .status-text.listening {
+            color: var(--accent-green);
+        }
+
+        .commands-section {
+            margin-top: 32px;
+        }
+
+        .commands-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .command-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .command-item {
+            padding: 12px;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .command-item::before {
+            content: '"';
+            display: block;
+            font-size: 1.5rem;
+            color: var(--accent-green);
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .mic-button {
+                width: 120px;
+                height: 120px;
+                font-size: 50px;
+            }
+
+            .command-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>🎤 Voice Control</h1>
+                <a href="/" class="back-btn">← Back</a>
+            </div>
+
+            <div class="content">
+                <div class="status-area">
+                    <div class="status-title">Listening Status</div>
+                    <div id="statusText" class="status-text">Press to start</div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button id="micButton" class="mic-button">🎤</button>
+                </div>
+
+                <div class="commands-section">
+                    <div class="commands-title">Example Commands</div>
+                    <div class="command-list">
+                        <div class="command-item">Take Off</div>
+                        <div class="command-item">Land</div>
+                        <div class="command-item">Move Forward</div>
+                        <div class="command-item">Move Back</div>
+                        <div class="command-item">Turn Left</div>
+                        <div class="command-item">Turn Right</div>
+                        <div class="command-item">Go Up</div>
+                        <div class="command-item">Go Down</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const micButton = document.getElementById('micButton');
+        const statusText = document.getElementById('statusText');
+        let isListening = false;
+
+        micButton.addEventListener('click', function() {
+            isListening = !isListening;
+
+            if (isListening) {
+                micButton.classList.add('listening');
+                statusText.classList.add('listening');
+                statusText.textContent = 'Listening...';
+                // Start actual voice recognition here
+                startListening();
+            } else {
+                micButton.classList.remove('listening');
+                statusText.classList.remove('listening');
+                statusText.textContent = 'Press to start';
+                stopListening();
+            }
+        });
+
+        function startListening() {
+            console.log('Voice recognition started');
+            // Integration point for Web Speech API or voice processing
+            // const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        }
+
+        function stopListening() {
+            console.log('Voice recognition stopped');
+        }
+    </script>
+</body>
+</html>

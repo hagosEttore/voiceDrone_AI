@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control - Voice Drone AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #1b5e20;
+            --primary-green-light: #2e7d32;
+            --accent-green: #66bb6a;
+            --background: linear-gradient(135deg, #f1f8f6 0%, #e8f5e9 100%);
+            --surface: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #757575;
+            --border: #e0e0e0;
+            --gradient-primary: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #4caf50 100%);
+            --gradient-accent: linear-gradient(135deg, #66bb6a 0%, #81c784 100%);
+            --gradient-card: linear-gradient(135deg, #ffffff 0%, #f1f8f6 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(27, 94, 32, 0.25);
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            gap: 10px;
+            padding: 10px;
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Left Side - Camera */
+        .camera-section {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .video-area {
+            background: #000;
+            border-radius: 8px;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            overflow: hidden;
+            flex: 1;
+            min-height: 350px;
+        }
+
+        .video-area video,
+        .video-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+            gap: 8px;
+        }
+
+        .control-btn {
+            padding: 8px 4px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+            color: var(--text-primary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(135deg, rgba(27, 94, 32, 0.15) 0%, rgba(46, 125, 50, 0.15) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(27, 94, 32, 0.2);
+        }
+
+        .control-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 16px rgba(27, 94, 32, 0.3);
+        }
+
+        .icon {
+            font-size: 16px;
+        }
+
+        /* Right Side - Voice Control */
+        .voice-section {
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .voice-card {
+            background: var(--gradient-card);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 16px rgba(27, 94, 32, 0.12);
+            flex: 1;
+            border: 1px solid rgba(102, 187, 106, 0.2);
+        }
+
+        .status-area {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(102, 187, 106, 0.1) 0%, rgba(129, 199, 132, 0.1) 100%);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 12px;
+            border: 1px solid rgba(102, 187, 106, 0.3);
+        }
+
+        .status-title {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .status-text {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .status-text.listening {
+            background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+
+        .mic-button {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(27, 94, 32, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mic-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 50%;
+        }
+
+        .mic-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 28px rgba(27, 94, 32, 0.45);
+        }
+
+        .mic-button.listening {
+            background: var(--gradient-accent);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 4px 16px rgba(102, 187, 106, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 16px rgba(102, 187, 106, 0.8);
+            }
+            100% {
+                box-shadow: 0 4px 16px rgba(102, 187, 106, 0.4);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-container {
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .voice-section {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+                padding: 8px;
+            }
+
+            .video-area {
+                aspect-ratio: 16 / 9;
+                min-height: 280px;
+            }
+
+            .voice-section {
+                width: 100%;
+                max-width: 320px;
+                margin: 0 auto;
+                flex-direction: row;
+            }
+
+            .voice-card {
+                flex: 1;
+            }
+
+            .camera-controls {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+                padding: 10px 12px;
+            }
+
+            .header h1 {
+                font-size: 1.1rem;
+            }
+
+            .main-container {
+                flex-direction: column;
+                padding: 6px;
+                gap: 8px;
+            }
+
+            .video-area {
+                aspect-ratio: 9 / 16;
+                min-height: 260px;
+            }
+
+            .voice-section {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .voice-card {
+                padding: 12px;
+            }
+
+            .mic-button {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+                margin: 0 auto 8px;
+            }
+
+            .camera-controls {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            .control-btn {
+                font-size: 0.65rem;
+                padding: 6px 3px;
+                gap: 3px;
+            }
+
+            .icon {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎮 Control Panel</h1>
+        <a href="/" class="back-btn">← Back</a>
+    </div>
+
+    <div class="main-container">
+        <!-- Left Side - Camera -->
+        <div class="camera-section">
+            <div class="video-area">
+                <div style="text-align: center; opacity: 0.6;">
+                    <div>Camera Feed</div>
+                    <div style="font-size: 0.9rem; margin-top: 8px;">Waiting for connection...</div>
+                </div>
+            </div>
+
+            <div class="camera-controls">
+                <button class="control-btn">
+                    <span class="icon">▶️</span>
+                    <span>Record</span>
+                </button>
+                <button class="control-btn">
+                    <span class="icon">📸</span>
+                    <span>Photo</span>
+                </button>
+                <button class="control-btn">
+                    <span class="icon">🔄</span>
+                    <span>Rotate</span>
+                </button>
+                <button class="control-btn">
+                    <span class="icon">⚡</span>
+                    <span>Focus</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Side - Voice Control -->
+        <div class="voice-section">
+            <div class="voice-card">
+                <div class="status-area">
+                    <div class="status-title">Listening</div>
+                    <div id="statusText" class="status-text">Press to start</div>
+                </div>
+
+                <button id="micButton" class="mic-button">🎤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Camera Controls
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const wasActive = this.classList.contains('active');
+                document.querySelectorAll('.control-btn').forEach(b => b.classList.remove('active'));
+                if (!wasActive) {
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Voice Controls
+        const micButton = document.getElementById('micButton');
+        const statusText = document.getElementById('statusText');
+        let isListening = false;
+
+        micButton.addEventListener('click', function() {
+            isListening = !isListening;
+
+            if (isListening) {
+                micButton.classList.add('listening');
+                statusText.classList.add('listening');
+                statusText.textContent = 'Listening...';
+                startListening();
+            } else {
+                micButton.classList.remove('listening');
+                statusText.classList.remove('listening');
+                statusText.textContent = 'Press to start';
+                stopListening();
+            }
+        });
+
+        function startListening() {
+            console.log('Voice recognition started');
+        }
+
+        function stopListening() {
+            console.log('Voice recognition stopped');
+        }
+    </script>
+</body>
+</html>

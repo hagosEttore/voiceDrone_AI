@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simuTelloStream Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /*
+         * STILE BASATO SU index_v111.html (Material Minimal)
+         */
+        :root {
+            --primary-color: #6200ee;
+            --primary-hover: #3700b3;
+            --error-color: #b00020;
+            --success-color: #00c853;
+            /* Aggiunto per stati positivi */
+            --background-color: #f5f5f5;
+            --surface-color: #ffffff;
+            --text-primary: rgba(0, 0, 0, 0.87);
+            --text-secondary: rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            width: 100%;
+            max-width: 900px;
+            /* Allargato leggermente per i controlli v120 */
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            letter-spacing: 0.0125em;
+            color: var(--text-primary);
+        }
+
+        /* Badges header stile v120 ma adattati */
+        .header-badges {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: #eee;
+            color: #666;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* VIDEO AREA */
+        .video-wrapper {
+            background-color: #000;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #videoFeed {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+            width: 100%;
+            /* Ensure full width like v120 */
+            object-fit: contain;
+        }
+
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            transition: opacity 0.3s;
+        }
+
+        .video-placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .video-sub {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+        }
+
+        /* CONTENT & CONTROLS */
+        .content {
+            padding: 24px;
+        }
+
+        /* Layout controlli v120 adattato - Grid per i 3 step */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .control-step {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        button {
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.089rem;
+            text-transform: uppercase;
+            padding: 12px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            /* Full width in column */
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+        }
+
+        button.success {
+            background-color: var(--success-color);
+        }
+
+        /* 
+           Adattamento switch v120 in stile pulsante toggle per coerenza
+           O uso lo switch CSS? Manteniamo lo switch ma stile material
+        */
+        .switch-material {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            height: 40px;
+            /* like button height */
+            display: flex;
+            align-items: center;
+        }
+
+        .switch-material input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-material {
+            position: relative;
+            cursor: pointer;
+            width: 50px;
+            height: 24px;
+            background-color: rgba(0, 0, 0, 0.38);
+            transition: .4s;
+            border-radius: 24px;
+            margin-right: auto;
+        }
+
+        .slider-material:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        input:checked+.slider-material {
+            background-color: rgba(0, 200, 83, 0.5);
+            /* Green with 50% opacity for track */
+            opacity: 1;
+        }
+
+        input:checked+.slider-material:before {
+            transform: translateX(26px);
+            background-color: var(--success-color);
+        }
+
+        /* Disabled switch */
+        input:disabled+.slider-material {
+            background-color: rgba(0, 0, 0, 0.12);
+            cursor: default;
+        }
+
+        input:disabled+.slider-material:before {
+            background-color: #bdbdbd;
+        }
+
+        button:disabled {
+            background-color: rgba(0, 0, 0, 0.12) !important;
+            color: rgba(0, 0, 0, 0.26) !important;
+            border: none !important;
+            box-shadow: none !important;
+            cursor: default;
+        }
+
+        .logs {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 10px;
+            min-height: 1.2em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <header>
+            <h1>simuTello Stream</h1>
+            <!-- Badges per feedback visuale rapido (da v120) -->
+            <div class="header-badges">
+                <div id="wifiBadge" class="badge">
+                    <div class="dot"></div> Wi-Fi
+                </div>
+                <div id="sdkBadge" class="badge">
+                    <div class="dot"></div> Drone
+                </div>
+                <div id="streamBadge" class="badge">
+                    <div class="dot"></div> Video
+                </div>
+                <div id="batteryBadge" class="badge">-- %</div>
+            </div>
+        </header>
+
+        <div class="video-wrapper">
+            <!-- Overlay sovraimpresso quando video non attivo (logica v120) -->
+            <div id="overlay" class="overlay-container">
+                <div id="overlayText" class="video-placeholder">Non Connesso</div>
+                <div id="overlaySub" class="video-sub">Segui i passaggi in basso</div>
+            </div>
+            <!-- Immagine flusso (id: videoFeed come in v120 logic) -->
+            <img id="videoFeed" alt="Drone Stream">
+        </div>
+
+        <div class="content">
+            <!-- Grid controlli 3 step (Logic v120) -->
+            <div class="controls-grid">
+                <!-- Step 1 -->
+                <div class="control-step">
+                    <span class="step-label">1. Rete</span>
+                    <button id="btnWifi" onclick="connectWifi()">Connetti Wi-Fi</button>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="control-step">
+                    <span class="step-label">2. Sistema</span>
+                    <button id="btnSdk" onclick="connectSdk()" disabled>Connetti Drone</button>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="control-step">
+                    <span class="step-label">3. Streaming</span>
+                    <!-- Switch custom stile material -->
+                    <label class="switch-material">
+                        <input type="checkbox" id="toggleStream" onchange="toggleStream()" disabled>
+                        <span class="slider-material"></span>
+                        <span
+                            style="margin-left: 12px; font-size: 0.875rem; text-transform: uppercase; font-weight: 700; color: var(--text-primary);">STREAM</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="logMsg" class="logs">Pronto.</div>
+        </div>
+    </div>
+
+    <script>
+        /*
+         * LOGICA COPIATA E ADATTATA DA index_v120.html
+         * (Per garantire il corretto funzionamento dello stepper)
+         */
+
+        // State Variables
+        let appState = {
+            state: 'DISCONNECTED', // DISCONNECTED, WIFI_CONNECTED, SDK_CONNECTED, STREAMING
+            battery: 0,
+            wifiSSID: ''
+        };
+
+        // DOM ELEMENTS
+        const els = {
+            btnWifi: document.getElementById('btnWifi'),
+            btnSdk: document.getElementById('btnSdk'),
+            toggleStream: document.getElementById('toggleStream'),
+
+            wifiBadge: document.getElementById('wifiBadge'),
+            sdkBadge: document.getElementById('sdkBadge'),
+            streamBadge: document.getElementById('streamBadge'),
+            batteryBadge: document.getElementById('batteryBadge'),
+
+            videoFeed: document.getElementById('videoFeed'),
+            overlay: document.getElementById('overlay'),
+            overlayText: document.getElementById('overlayText'),
+            overlaySub: document.getElementById('overlaySub'),
+            logMsg: document.getElementById('logMsg')
+        };
+
+        // UTILITY
+        function log(msg) {
+            els.logMsg.textContent = msg;
+            console.log('[App]', msg);
+        }
+
+        // API CALLS (v120 Standard)
+        async function connectWifi() {
+            log("Connessione Wi-Fi in corso...");
+            try {
+                const res = await fetch('/connect_wifi', { method: 'POST' });
+                const data = await res.json();
+                log(data.message);
+            } catch (e) { log("Errore API Wi-Fi"); }
+        }
+
+        async function connectSdk() {
+            log("Inizializzazione SDK Tello...");
+            els.btnSdk.disabled = true;
+            connectSdk.transitioning = true;
+
+            try {
+                const res = await fetch('/connect_sdk', { method: 'POST' });
+                const data = await res.json();
+                log(data.message);
+                setTimeout(() => { connectSdk.transitioning = false; }, 2000);
+            } catch (e) {
+                log("Errore API SDK");
+                els.btnSdk.disabled = false;
+                connectSdk.transitioning = false;
+            }
+        }
+
+        async function toggleStream() {
+            const enable = els.toggleStream.checked;
+            log(enable ? "Avvio Streaming..." : "Arresto Streaming...");
+            toggleStream.transitioning = true;
+
+            try {
+                const endpoint = enable ? '/start_stream' : '/stop_stream';
+                const res = await fetch(endpoint, { method: 'POST' });
+                const data = await res.json();
+                log(data.message);
+                setTimeout(() => { toggleStream.transitioning = false; }, 2000);
+            } catch (e) {
+                log("Errore API Stream");
+                els.toggleStream.checked = !enable;
+                toggleStream.transitioning = false;
+            }
+        }
+
+        // POLLING
+        async function pollStatus() {
+            try {
+                const res = await fetch('/status');
+                const data = await res.json();
+                appState = data;
+                render();
+            } catch (e) { console.error("Polling error", e); }
+        }
+
+        // RENDER UI (Logic v120)
+        function render() {
+            const s = appState.state;
+            const previousState = render.previousState || 'DISCONNECTED';
+
+            if (previousState === 'STREAMING' && s !== 'STREAMING') {
+                els.videoFeed.src = '';
+            }
+            render.previousState = s;
+
+            // Badges
+            setBadges(s);
+            els.batteryBadge.textContent = appState.battery + ' %';
+
+            // Video Feed
+            if (s === 'STREAMING' && previousState !== 'STREAMING') {
+                els.videoFeed.src = '/video_feed';
+            } else if (s !== 'STREAMING' && previousState === 'STREAMING') {
+                els.videoFeed.src = '';
+            }
+
+            // Buttons Logic
+            if (s === 'DISCONNECTED') {
+                els.btnWifi.classList.remove('success');
+                els.btnWifi.innerText = 'CONNETTI WI-FI';
+
+                els.btnSdk.disabled = true;
+                els.btnSdk.classList.remove('success');
+                els.btnSdk.innerText = 'CONNETTI DRONE';
+
+                els.toggleStream.disabled = true;
+                els.toggleStream.checked = false;
+
+                showOverlay("Non Connesso", "Connettiti al Wi-Fi del Tello per iniziare");
+            }
+            else if (s === 'WIFI_CONNECTED') {
+                els.btnWifi.classList.add('success');
+                els.btnWifi.innerText = 'WI-FI OK';
+
+                if (!connectSdk.transitioning) {
+                    els.btnSdk.disabled = false;
+                    els.btnSdk.innerText = 'CONNETTI DRONE';
+                    els.btnSdk.classList.remove('success');
+                }
+
+                els.toggleStream.disabled = true;
+                els.toggleStream.checked = false;
+                showOverlay("Wi-Fi Connesso", "Ora inizializza l'SDK del drone");
+            }
+            else if (s === 'SDK_CONNECTED') {
+                els.btnWifi.classList.add('success');
+                els.btnSdk.disabled = false; // Keep enabled to allow retry or distinct check? v120 allows it.
+                els.btnSdk.classList.add('success');
+                els.btnSdk.innerText = 'DRONE OK';
+
+                if (!toggleStream.transitioning) {
+                    els.toggleStream.disabled = false;
+                    els.toggleStream.checked = false;
+                }
+                showOverlay("Drone Pronto", "Attiva lo switch per vedere il video");
+            }
+            else if (s === 'STREAMING') {
+                els.btnWifi.classList.add('success');
+                els.btnSdk.classList.add('success');
+
+                if (!toggleStream.transitioning) {
+                    els.toggleStream.disabled = false; // Allow stopping
+                    els.toggleStream.checked = true;
+                }
+                hideOverlay();
+            }
+        }
+
+        function setBadges(state) {
+            els.wifiBadge.classList.remove('active');
+            els.sdkBadge.classList.remove('active');
+            els.streamBadge.classList.remove('active');
+
+            if (['WIFI_CONNECTED', 'SDK_CONNECTED', 'STREAMING'].includes(state))
+                els.wifiBadge.classList.add('active');
+
+            if (['SDK_CONNECTED', 'STREAMING'].includes(state))
+                els.sdkBadge.classList.add('active');
+
+            if (state === 'STREAMING')
+                els.streamBadge.classList.add('active');
+        }
+
+        function showOverlay(title, sub) {
+            els.overlay.style.opacity = '1';
+            els.overlay.style.pointerEvents = 'auto'; // Block clicks on video
+            els.videoFeed.style.opacity = '0.3'; // Dim video placeholder
+            els.overlayText.textContent = title;
+            els.overlaySub.textContent = sub;
+        }
+
+        function hideOverlay() {
+            els.overlay.style.opacity = '0';
+            els.overlay.style.pointerEvents = 'none';
+            els.videoFeed.style.opacity = '1';
+            els.videoFeed.style.display = 'block';
+        }
+
+        setInterval(pollStatus, 1000);
+    </script>
+</body>
+
+</html>

@@ -1,20 +1,3 @@
-from djitellopy import Tello
-import time
-
-# Inizializza il drone
-tello = Tello()
-tello.connect()
-print("Batteria:", tello.get_battery(), "%")
-
-print("sto decollando")
-tello.takeoff()
-time.sleep(5)  # piccolo ritardo per stabilizzarsi
-
-# Flip avanti
-print("sto facendo un flip")
-tello.flip("f")
-time.sleep(1)  # piccolo ritardo
-
-# Atterraggio
-print("sto atterrando")
-tello.land()
+version https://git-lfs.github.com/spec/v1
+oid sha256:4e180c2466784c9313dd66898ac7d780e90ea7f4bfffeb0fcd5e6011cdbb26b8
+size 397

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Mode - Voice Drone AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #1b5e20;
+            --primary-green-light: #2e7d32;
+            --accent-green: #66bb6a;
+            --background: #f1f8f6;
+            --surface: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #757575;
+            --border: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            padding: 32px 24px;
+        }
+
+        .video-area {
+            background: #000;
+            border-radius: 8px;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: white;
+            font-size: 1.2rem;
+            overflow: hidden;
+        }
+
+        .video-area video,
+        .video-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .controls-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .control-btn {
+            padding: 16px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--background);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(135deg, rgba(27, 94, 32, 0.1) 0%, rgba(46, 125, 50, 0.1) 100%);
+            border-color: var(--primary-green-light);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .icon {
+            font-size: 24px;
+        }
+
+        .info-section {
+            background: var(--background);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 24px;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .info-section h3 {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .info-section p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .video-area {
+                aspect-ratio: 9 / 16;
+            }
+
+            .controls-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>📷 Camera Mode</h1>
+                <a href="/" class="back-btn">← Back</a>
+            </div>
+
+            <div class="content">
+                <div class="video-area">
+                    <div style="text-align: center; opacity: 0.6;">
+                        <div>Camera Feed</div>
+                        <div style="font-size: 0.9rem; margin-top: 8px;">Waiting for connection...</div>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <button class="control-btn">
+                        <span class="icon">▶️</span>
+                        <span>Start Recording</span>
+                    </button>
+                    <button class="control-btn">
+                        <span class="icon">📸</span>
+                        <span>Take Photo</span>
+                    </button>
+                    <button class="control-btn">
+                        <span class="icon">🔄</span>
+                        <span>Rotate View</span>
+                    </button>
+                    <button class="control-btn">
+                        <span class="icon">⚡</span>
+                        <span>Auto Focus</span>
+                    </button>
+                </div>
+
+                <div class="info-section">
+                    <h3>Camera Information</h3>
+                    <p>
+                        Connect your drone to view the live camera feed. Use the controls above to record video, 
+                        take photos, and adjust camera settings in real-time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Toggle active state
+                const wasActive = this.classList.contains('active');
+                document.querySelectorAll('.control-btn').forEach(b => b.classList.remove('active'));
+                if (!wasActive) {
+                    this.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

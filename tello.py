@@ -1,12 +1,3 @@
-from djitellopy import Tello
-
-tello = Tello()
-tello.connect()
-
-tello.takeoff()
-
-tello.move_left(100)
-tello.rotate_counter_clockwise(90)
-tello.move_forward(100)
-
-tello.land()
+version https://git-lfs.github.com/spec/v1
+oid sha256:a4c70b48dadeaa34b353dd32da692ed9de20d6aaf19cc5dc5c5c3cac032e8c5f
+size 184

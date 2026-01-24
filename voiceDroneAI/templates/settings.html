@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Voice Drone AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #1b5e20;
+            --primary-green-light: #2e7d32;
+            --accent-green: #66bb6a;
+            --background: #f1f8f6;
+            --surface: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #757575;
+            --border: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+        .settings-group {
+            margin-bottom: 28px;
+        }
+
+        .settings-group-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .setting-item {
+            padding: 16px;
+            background: var(--background);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .setting-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .setting-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .setting-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--accent-green);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Select & Input */
+        select, input[type="text"], input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background: white;
+            cursor: pointer;
+        }
+
+        select:focus, input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.1);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .action-btn {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--background);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, rgba(27, 94, 32, 0.1) 0%, rgba(46, 125, 50, 0.1) 100%);
+            border-color: var(--primary-green-light);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .action-btn.primary:hover {
+            background: linear-gradient(135deg, var(--primary-green-light) 0%, #2e7d32 100%);
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>⚙️ Settings</h1>
+                <a href="/" class="back-btn">← Back</a>
+            </div>
+
+            <div class="content">
+                <!-- Connection Settings -->
+                <div class="settings-group">
+                    <div class="settings-group-title">Connection</div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Drone Connection</div>
+                            <div class="setting-desc">Auto-connect to drone on startup</div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="toggle">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Drone Network</div>
+                            <div class="setting-desc">Select your drone's Wi-Fi network</div>
+                        </div>
+                        <div class="setting-control">
+                            <select>
+                                <option>Not Connected</option>
+                                <option>Tello-12345</option>
+                                <option>Tello-67890</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Camera Settings -->
+                <div class="settings-group">
+                    <div class="settings-group-title">Camera</div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Resolution</div>
+                            <div class="setting-desc">Video capture quality</div>
+                        </div>
+                        <div class="setting-control">
+                            <select>
+                                <option>720p</option>
+                                <option>1080p</option>
+                                <option>2K</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Auto-Record</div>
+                            <div class="setting-desc">Automatically record when streaming starts</div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="toggle">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voice Control Settings -->
+                <div class="settings-group">
+                    <div class="settings-group-title">Voice Control</div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Voice Recognition</div>
+                            <div class="setting-desc">Enable voice command recognition</div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="toggle">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Language</div>
+                            <div class="setting-desc">Voice command language</div>
+                        </div>
+                        <div class="setting-control">
+                            <select>
+                                <option>English</option>
+                                <option>Italian</option>
+                                <option>Spanish</option>
+                                <option>French</option>
+                                <option>German</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Mic Sensitivity</div>
+                            <div class="setting-desc">Microphone input level</div>
+                        </div>
+                        <div class="setting-control">
+                            <input type="number" min="0" max="100" value="75" style="width: 60px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Settings -->
+                <div class="settings-group">
+                    <div class="settings-group-title">System</div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Dark Mode</div>
+                            <div class="setting-desc">Enable dark theme</div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="toggle">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-btn">Reset</button>
+                    <button class="action-btn primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle switches interaction
+        document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                console.log('Setting changed:', this.checked);
+            });
+        });
+
+        // Save button
+        document.querySelector('.action-btn.primary').addEventListener('click', function() {
+            console.log('Settings saved');
+            alert('Settings saved successfully!');
+        });
+
+        // Reset button
+        document.querySelector('.action-btn:not(.primary)').addEventListener('click', function() {
+            if (confirm('Are you sure? This will reset all settings to default.')) {
+                console.log('Settings reset');
+                location.reload();
+            }
+        });
+    </script>
+</body>
+</html>
