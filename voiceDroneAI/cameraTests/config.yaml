@@ -93,7 +93,7 @@ glyph_detection:
 text_detection:
   text_detection_language: "it"
   text_detection_threshold: 0.7
-  text_detection_gpu_mode: false
+  text_detection_gpu_mode: true
 
   textbox_color: [0, 255, 0]
   box_thickness: 1

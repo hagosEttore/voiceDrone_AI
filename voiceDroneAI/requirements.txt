@@ -38,10 +38,10 @@ scikit-image==0.26.0
 scipy==1.17.0
 shapely==2.1.2
 six==1.17.0
-sympy==1.14.0
+sympy==1.13.1
 tifffile==2026.1.14
-torch==2.10.0
-torchvision==0.25.0
+torch==2.5.1+cu121
+torchvision==0.20.1+cu121
 typing_extensions==4.15.0
 urllib3==2.6.3
 Werkzeug==3.1.5
