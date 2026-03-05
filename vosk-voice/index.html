@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vosk Voice Control</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #e0e0e0;
+            --accent: #00e676;
+            --danger: #ff5252;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            background-color: #555;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .active {
+            background-color: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        #chat-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card);
+            border-radius: 15px;
+            padding: 20px;
+            height: 50vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid #333;
+        }
+
+        .message {
+            padding: 12px 18px;
+            border-radius: 10px;
+            background: #2c2c2c;
+            max-width: 85%;
+            animation: fadeIn 0.2s ease;
+            line-height: 1.5;
+            align-self: flex-start;
+        }
+
+        .partial {
+            color: #888;
+            font-style: italic;
+            background: none;
+            border: 1px dashed #444;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1rem;
+            color: #000;
+        }
+
+        #startBtn {
+            background: var(--accent);
+        }
+
+        #stopBtn {
+            background: var(--danger);
+            display: none;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Vosk AI Recognition</h1>
+        <div><span id="dot" class="status-dot"></span> <span id="status">Scollegato</span></div>
+    </div>
+
+    <div id="chat-container">
+        <div id="history"></div>
+        <div id="live-preview" class="message partial" style="display: none;"></div>
+    </div>
+
+    <div class="controls">
+        <button id="startBtn">Avvia Ascolto</button>
+        <button id="stopBtn">Interrompi</button>
+    </div>
+
+    <script>
+        let socket;
+        let audioContext;
+        let micStream;
+        let processor;
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const history = document.getElementById('history');
+        const livePreview = document.getElementById('live-preview');
+        const statusText = document.getElementById('status');
+        const dot = document.getElementById('dot');
+
+        async function startAudio() {
+            try {
+                // Richiedi esplicitamente 16000Hz — stesso approccio della versione funzionante
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const source = audioContext.createMediaStreamSource(micStream);
+
+                processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+                processor.onaudioprocess = (e) => {
+                    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+                    const input = e.inputBuffer.getChannelData(0);
+                    const pcm = new Int16Array(input.length);
+                    for (let i = 0; i < input.length; i++) {
+                        pcm[i] = Math.max(-1, Math.min(1, input[i])) * 0x7FFF;
+                    }
+                    socket.send(pcm.buffer);
+                };
+
+                source.connect(processor);
+                processor.connect(audioContext.destination);
+            } catch (err) {
+                console.error("Errore accesso microfono:", err);
+                statusText.innerText = "Errore Microfono";
+                stopSystem();
+            }
+        }
+
+        function stopSystem() {
+            if (socket) socket.close();
+
+            if (micStream) {
+                micStream.getTracks().forEach(track => track.stop());
+            }
+
+            if (processor) {
+                processor.disconnect();
+                processor = null;
+            }
+
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+
+            dot.classList.remove('active');
+            statusText.innerText = "Scollegato";
+            startBtn.style.display = "block";
+            stopBtn.style.display = "none";
+            livePreview.style.display = "none";
+            livePreview.innerText = "";
+        }
+
+        startBtn.onclick = () => {
+            startBtn.style.display = "none";
+            stopBtn.style.display = "block";
+            statusText.innerText = "Connessione...";
+
+            // Crea WebSocket (pattern da index_ai_realtime.html)
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
+            
+            console.log('[Voice] Connessione a:', wsUrl);
+            socket = new WebSocket(wsUrl);
+
+            socket.onopen = () => {
+                console.log('[WebSocket] Connessione aperta');
+                statusText.innerText = "In ascolto";
+                dot.classList.add('active');
+                startAudio();
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.error) {
+                    console.error('[WebSocket] Errore:', data.error);
+                    statusText.innerText = 'Errore: ' + data.error;
+                    stopSystem();
+                    return;
+                }
+                
+                if (data.is_final) {
+                    // Risultato finale
+                    livePreview.style.display = "none";
+                    livePreview.innerText = "";
+                    const msg = document.createElement('div');
+                    msg.className = 'message';
+                    msg.innerText = data.text;
+                    history.appendChild(msg);
+                    document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+                } else {
+                    // Risultato parziale
+                    livePreview.style.display = "block";
+                    livePreview.innerText = data.text + "...";
+                }
+            };
+
+            socket.onclose = () => {
+                console.log('[WebSocket] Connessione chiusa');
+                stopSystem();
+            };
+            
+            socket.onerror = (err) => {
+                console.error('[WebSocket] Errore evento');
+                statusText.innerText = 'Errore connessione WebSocket';
+                stopSystem();
+            };
+        };
+
+        stopBtn.onclick = () => {
+            stopSystem();
+        };
+    </script>
+</body>
+
+</html>

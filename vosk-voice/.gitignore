@@ -1,0 +1,14 @@
+# Virtual environment
+venv/
+
+# Vosk model (large binary files)
+model-it/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db

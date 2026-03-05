@@ -1,0 +1,6 @@
+# Web Server e API
+flask
+flask-sock
+
+# Elaborazione Audio e Riconoscimento Vocale
+vosk
